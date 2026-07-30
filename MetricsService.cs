@@ -4,6 +4,7 @@ using System.Net.Http;
 using System.Reflection;
 using System.Security.Cryptography;
 using System.Text;
+using System.Threading.Tasks;
 using Dalamud.Bindings.ImGui;
 using Newtonsoft.Json;
 using SimpleTweaksPlugin.TweakSystem;
@@ -11,7 +12,7 @@ using SimpleTweaksPlugin.Utility;
 
 namespace SimpleTweaksPlugin; 
 
-public static unsafe class MetricsService {
+public static class MetricsService {
     private static SimpleTweaksPlugin Plugin => SimpleTweaksPlugin.Plugin;
     private static SimpleTweaksPluginConfig Config => Plugin.PluginConfig;
     
@@ -72,7 +73,20 @@ public static unsafe class MetricsService {
             TypeNameHandling = TypeNameHandling.None
         });
 
-        Common.HttpClient.PostAsync("https://metrics.simpletweaks.app/report", new StringContent(json)).ConfigureAwait(false);
+        _ = ReportMetricsAsync(json);
+    }
+
+    private static async Task ReportMetricsAsync(string json) {
+        try {
+            using var content = new StringContent(json);
+            using var response = await Common.HttpClient
+                .PostAsync("https://metrics.simpletweaks.app/report", content)
+                .ConfigureAwait(false);
+        } catch (Exception ex) {
+            // Metrics are optional and must never surface as an unobserved task
+            // exception when the endpoint or DNS is unavailable.
+            SimpleLog.Debug($"Metrics report failed: {ex.Message}");
+        }
     }
     
     public class MetricsPayload {
