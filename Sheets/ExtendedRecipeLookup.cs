@@ -1,4 +1,4 @@
-﻿// ReSharper disable All
+// ReSharper disable All
 
 using Lumina;
 using Lumina.Text;
@@ -11,6 +11,9 @@ namespace SimpleTweaksPlugin.Sheets;
 
 [Sheet( "RecipeLookup")]
 readonly unsafe public struct ExtendedRecipeLookup(ExcelPage page, uint offset, uint row) : IRowExtension<ExtendedRecipeLookup, RecipeLookup> {
+    public ExcelPage ExcelPage => page;
+    public uint RowOffset => offset;
+
     public readonly RecipeLookup RecipeLookup => new RecipeLookup(page, offset, row);
     
     public readonly RowRef<Recipe>[] Recipes =>

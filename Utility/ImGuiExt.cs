@@ -1,4 +1,5 @@
-﻿using System;
+using ModifierFlag = FFXIVClientStructs.FFXIV.Client.System.Input.KeyModifierFlag;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;

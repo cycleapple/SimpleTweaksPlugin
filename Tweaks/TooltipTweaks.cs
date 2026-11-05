@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Linq;
 using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Memory;
@@ -116,12 +116,12 @@ public unsafe class TooltipTweaks : SubTweakManager<TooltipTweaks.SubTweak> {
 
     public static uint LastLoadedItem { get; private set; }
 
-    private void ActionHoveredDetour(AgentActionDetail* agent, ActionKind actionKind, uint actionId, int flag, bool isLovmActionDetail) {
+    private void ActionHoveredDetour(AgentActionDetail* agent, ActionKind actionKind, uint actionId, int flag, bool isLovmActionDetail, int a5, int a6) {
         HoveredAction.Category = actionKind;
         HoveredAction.Id = actionId;
         HoveredAction.Flag = flag;
         HoveredAction.IsLovmActionDetail = isLovmActionDetail;
-        actionHoveredHook?.Original(agent, actionKind, actionId, flag, isLovmActionDetail);
+        actionHoveredHook?.Original(agent, actionKind, actionId, flag, isLovmActionDetail, a5, a6);
     }
 
     private IntPtr ActionTooltipDetour(AtkUnitBase* addon, void* a2, ulong a3) {

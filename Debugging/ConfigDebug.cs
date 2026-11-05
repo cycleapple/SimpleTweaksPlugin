@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -19,7 +19,7 @@ public unsafe class ConfigDebug : DebugHelper {
 
     private void DrawConfigBase(ConfigBase* configBase) {
         ImGui.Text($"Config Count: {configBase->ConfigCount}");
-        ImGui.Text($"{configBase->UnkString.ToString()}");
+        ImGui.TextUnformatted("API14: private configuration field");
 
         DebugManager.PrintAddress(configBase);
         ImGui.SameLine();

@@ -9,6 +9,9 @@ namespace SimpleTweaksPlugin.Sheets;
 
 [Sheet( "ItemLevel")]
 public readonly unsafe struct ExtendedItemLevel(ExcelPage page, uint offset, uint row) : IRowExtension<ExtendedItemLevel, ItemLevel> {
+    public ExcelPage ExcelPage => page;
+    public uint RowOffset => offset;
+
     private const int ParamCount = 75;
     // public readonly ushort[] BaseParam = new ushort[75];
     public RowRef<ItemLevel> ItemLevel => new(page.Module, row, page.Language);

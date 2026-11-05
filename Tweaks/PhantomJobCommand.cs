@@ -15,7 +15,7 @@ public unsafe class PhantomJobCommand : CommandTweak {
     protected override string Command => "/phantomjob";
 
     protected override void OnCommand(string args) {
-        if (GameMain.Instance()->CurrentTerritoryIntendedUseId != 61) {
+        if ((uint)GameMain.Instance()->CurrentTerritoryIntendedUseId != 61) {
             Service.Chat.PrintError("You can only use this command in Occult Crescent", "Simple Tweaks", 500);
             return;
         }
@@ -28,7 +28,7 @@ public unsafe class PhantomJobCommand : CommandTweak {
         if (!uint.TryParse(args, out var id)) {
             id = uint.MaxValue;
             foreach (var pj in Service.Data.GetExcelSheet<MKDSupportJob>()) {
-                if (!pj.Unknown0.ExtractText().Contains(args.Trim(), StringComparison.InvariantCultureIgnoreCase)) continue;
+                if (!pj.Name.ExtractText().Contains(args.Trim(), StringComparison.InvariantCultureIgnoreCase)) continue;
                 id = pj.RowId;
                 break;
             }

@@ -1,3 +1,4 @@
+using ModifierFlag = FFXIVClientStructs.FFXIV.Client.System.Input.KeyModifierFlag;
 using System.Runtime.InteropServices;
 using Dalamud.Interface.Utility.Raii;
 using Dalamud.Utility.Signatures;

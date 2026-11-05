@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -1145,10 +1145,12 @@ public unsafe class UIDebug : DebugHelper {
             switch (objectInfo->ComponentType) {
                 case ComponentType.TextInput:
                     var textInputComponent = (AtkComponentTextInput*)compNode->Component;
-                    ImGui.Text($"InputBase Text1: {Marshal.PtrToStringAnsi(new IntPtr(textInputComponent->AtkComponentInputBase.UnkText1.StringPtr))}");
-                    ImGui.Text($"InputBase Text2: {Marshal.PtrToStringAnsi(new IntPtr(textInputComponent->AtkComponentInputBase.UnkText2.StringPtr))}");
-                    ImGui.Text($"Text1: {Marshal.PtrToStringAnsi(new IntPtr(textInputComponent->UnkText01.StringPtr))}");
-                    ImGui.Text($"Text2: {Marshal.PtrToStringAnsi(new IntPtr(textInputComponent->UnkText02.StringPtr))}");
+                    ImGui.Text($"InputBase Text1: {Marshal.PtrToStringAnsi(new IntPtr(textInputComponent->AtkComponentInputBase.EvaluatedString.StringPtr))}");
+                    ImGui.Text($"InputBase Text2: {Marshal.PtrToStringAnsi(new IntPtr(textInputComponent->AtkComponentInputBase.RawString.StringPtr))}");
+
+                    ImGui.TextUnformatted("API14: private text-input buffer");
+
+                    ImGui.TextUnformatted("API14: private text-input buffer");
                     ImGui.Text($"Text3: {Marshal.PtrToStringAnsi(new IntPtr(textInputComponent->AvailableLines.StringPtr))}");
                     ImGui.Text($"Text4: {Marshal.PtrToStringAnsi(new IntPtr(textInputComponent->HighlightedAutoTranslateOptionColorPrefix.StringPtr))}");
                     ImGui.Text($"Text5: {Marshal.PtrToStringAnsi(new IntPtr(textInputComponent->HighlightedAutoTranslateOptionColorSuffix.StringPtr))}");
@@ -1237,7 +1239,7 @@ public unsafe class UIDebug : DebugHelper {
                         ImGui.TableNextColumn();
                         ImGui.Text($"{evt->State.StateFlags}");
                         ImGui.TableNextColumn();
-                        ImGui.Text($"{evt->State.ReturnFlags}/{evt->State.UnkFlags3}");
+                        ImGui.Text($"{evt->State.ReturnFlags}/API14 private field");
                         ImGui.TableNextColumn();
                         DebugManager.PrintAddress(evt->Target);
                         ImGui.TableNextColumn();

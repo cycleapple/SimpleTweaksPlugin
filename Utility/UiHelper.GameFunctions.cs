@@ -1,4 +1,5 @@
-﻿using System;
+using Dalamud.Plugin.Services;
+using System;
 using System.Runtime.InteropServices;
 using Dalamud.Game;
 using FFXIVClientStructs.FFXIV.Client.System.Memory;

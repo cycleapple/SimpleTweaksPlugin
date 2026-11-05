@@ -108,21 +108,6 @@ public static unsafe class EventController {
                         return true;
                     }
 
-                    if (p[0].ParameterType == typeof(AddonUpdateArgs)) {
-                        Kind = SubscriberKind.AddonUpdateArgs;
-                        return true;
-                    }
-
-                    if (p[0].ParameterType == typeof(AddonDrawArgs)) {
-                        Kind = SubscriberKind.AddonDrawArgs;
-                        return true;
-                    }
-
-                    if (p[0].ParameterType == typeof(AddonFinalizeArgs)) {
-                        Kind = SubscriberKind.AddonFinalizeArgs;
-                        return true;
-                    }
-
                     if (p[0].ParameterType == typeof(AddonRequestedUpdateArgs)) {
                         Kind = SubscriberKind.AddonRequestedUpdateArgs;
                         return true;
@@ -194,9 +179,6 @@ public static unsafe class EventController {
                     SubscriberKind.AddonPointerWithArrays => Method.Invoke(Tweak, [Pointer.Box((void*)((AddonArgs)args).Addon.Address, addonPointerType), Pointer.Box(AtkStage.Instance()->GetNumberArrayData(), typeof(NumberArrayData**)), Pointer.Box(AtkStage.Instance()->GetStringArrayData(), typeof(StringArrayData**))]),
                     SubscriberKind.AddonArgs => Method.Invoke(Tweak, [args]),
                     SubscriberKind.AddonSetupArgs when args is AddonSetupArgs addonSetupArgs => Method.Invoke(Tweak, [addonSetupArgs]),
-                    SubscriberKind.AddonUpdateArgs when args is AddonUpdateArgs addonUpdateArgs => Method.Invoke(Tweak, [addonUpdateArgs]),
-                    SubscriberKind.AddonDrawArgs when args is AddonDrawArgs addonDrawArgs => Method.Invoke(Tweak, [addonDrawArgs]),
-                    SubscriberKind.AddonFinalizeArgs when args is AddonFinalizeArgs addonFinalizeArgs => Method.Invoke(Tweak, [addonFinalizeArgs]),
                     SubscriberKind.AddonRequestedUpdateArgs when args is AddonRequestedUpdateArgs addonRequestedUpdateArgs => Method.Invoke(Tweak, [addonRequestedUpdateArgs]),
                     SubscriberKind.AddonRefreshArgs when args is AddonRefreshArgs addonRefreshArgs => Method.Invoke(Tweak, [addonRefreshArgs]),
                     SubscriberKind.AddonReceiveEventArgs when args is AddonReceiveEventArgs addonReceiveEventArgs => Method.Invoke(Tweak, [addonReceiveEventArgs]),

@@ -1,4 +1,4 @@
-﻿using FFXIVClientStructs.FFXIV.Client.System.Memory;
+using FFXIVClientStructs.FFXIV.Client.System.Memory;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 using Lumina.Excel.Sheets;
@@ -42,7 +42,7 @@ public unsafe class PaintingPreview : TooltipTweaks.SubTweak {
             imageNode->AtkResNode.NodeFlags = NodeFlags.AnchorTop | NodeFlags.AnchorLeft;
             imageNode->AtkResNode.DrawFlags = 0;
             imageNode->WrapMode = 1;
-            imageNode->Flags = 128;
+            imageNode->Flags = (FFXIVClientStructs.FFXIV.Component.GUI.ImageNodeFlags)128;
 
             var partsList = (AtkUldPartsList*)IMemorySpace.GetUISpace()->Malloc((ulong)sizeof(AtkUldPartsList), 8);
             if (partsList == null) {

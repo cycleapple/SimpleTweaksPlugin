@@ -1,3 +1,4 @@
+using FFXIVClientStructs.FFXIV.Client.System.Input;
 using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
