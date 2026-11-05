@@ -5,7 +5,7 @@ using Lumina.Excel.Sheets;
 
 namespace SimpleTweaksPlugin.Sheets; 
 
-[Sheet( "BaseParam")]
+[Sheet("BaseParam", 469253919u)]
 public readonly unsafe struct ExtendedBaseParam(ExcelPage page, uint offset, uint row) : IRowExtension<ExtendedBaseParam, BaseParam> {
     public ExcelPage ExcelPage => page;
     public uint RowOffset => offset;

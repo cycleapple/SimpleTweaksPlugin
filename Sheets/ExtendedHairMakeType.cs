@@ -5,7 +5,7 @@ using Lumina.Excel.Sheets;
 
 namespace SimpleTweaksPlugin.Sheets;
 
-[Sheet("HairMakeType")]
+[Sheet("HairMakeType", 3374538714u)]
 public readonly unsafe struct HairMakeTypeExt : IRowExtension<HairMakeTypeExt, HairMakeType> {
     public uint RowId { get; }
     public ExcelPage ExcelPage => HairMakeType.ExcelPage;

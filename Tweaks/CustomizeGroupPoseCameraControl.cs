@@ -52,7 +52,7 @@ public unsafe class CustomizeGroupPoseCameraControl : Tweak {
 
     [StructLayout(LayoutKind.Explicit, Size = 0x2B0)]
     private struct CameraStruct {
-        [FieldOffset(0x160)] public float Rotation;
+        [FieldOffset(0x170)] public float Rotation; // API14 camera roll; 0x160 is the pan vector.
     }
 
     private void* CameraUpdateDetour(CameraStruct* camera) {

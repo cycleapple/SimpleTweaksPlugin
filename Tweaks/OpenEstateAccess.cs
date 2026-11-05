@@ -1,6 +1,7 @@
 using System.Runtime.InteropServices;
 using Dalamud.Game.Text.SeStringHandling;
 using Dalamud.Utility.Signatures;
+using FFXIVClientStructs.Attributes;
 using FFXIVClientStructs.FFXIV.Client.Game;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
@@ -14,22 +15,28 @@ namespace SimpleTweaksPlugin.Tweaks;
 [TweakDescription("Adds a command to open the estate access configuration for the current estate.")]
 [TweakReleaseVersion("1.10.5.0")]
 public unsafe class OpenEstateAccess : CommandTweak {
+    // Preserve the existing command base behavior; macro error suppression was added upstream later.
+    private const bool ShowCommandErrors = true;
     private delegate byte OpenEstateAccessSettingsDelegate(AgentHousing* agentHousing);
 
     [Signature("E8 ?? ?? ?? ?? 84 C0 0F 85 ?? ?? ?? ?? 40 32 F6 E9 ?? ?? ?? ?? E8")]
     private readonly OpenEstateAccessSettingsDelegate openEstateAccessSettings = null!;
 
-    private delegate HouseId GetOwnedHouseId(int type, int index = -1);
-
-    [Signature("E8 ?? ?? ?? ?? 48 8B C8 E8 ?? ?? ?? ?? 8D 56 FE")]
-    private readonly GetOwnedHouseId getOwnedHouseId = null!;
-
     [TweakHook(typeof(AtkUnitBase), nameof(AtkUnitBase.FireCallback), nameof(FireCallbackDetour), AutoEnable = false)]
     private readonly HookWrapper<AtkUnitBase.Delegates.FireCallback>? fireCallbackHook;
 
     [StructLayout(LayoutKind.Explicit, Size = 0xDE90)]
+    [Agent(AgentId.Housing)]
     private struct AgentHousing {
-        [FieldOffset(0xA734)] public EstateType SelectedEstateType;
+        [FieldOffset(0xA734)] public SelectedEstateType SelectedEstateType;
+    }
+
+    private enum SelectedEstateType {
+        // We'll never know why SE made this order different.
+        PersonalEstate,
+        FreeCompanyEstate,
+        PersonalChambers,
+        ApartmentRoom,
     }
     
     private SeString CommandUsage {
@@ -71,47 +78,56 @@ public unsafe class OpenEstateAccess : CommandTweak {
             case "":
                 var housingManager = HousingManager.Instance();
                 if (housingManager == null || housingManager->IsInside() == false) {
-                    Service.Chat.PrintError("You are not inside your own estate.", Name);
-                    Service.Chat.PrintError(CommandUsage, Name);
+                    if (ShowCommandErrors) {
+                        Service.Chat.PrintError("You are not inside your own estate.", Name);
+                        Service.Chat.PrintError(CommandUsage, Name);
+                    }
+
                     return;
                 }
 
                 var houseId = housingManager->GetCurrentIndoorHouseId();
-                if (getOwnedHouseId(0) == houseId) {
-                    agent->SelectedEstateType = EstateType.FreeCompanyEstate;
-                } else if (getOwnedHouseId(1) == houseId) {
-                    agent->SelectedEstateType = EstateType.PersonalChambers;
-                } else if (getOwnedHouseId(2) == houseId) {
-                    agent->SelectedEstateType = EstateType.PersonalEstate;
-                } else if (getOwnedHouseId(6) == houseId) {
-                    agent->SelectedEstateType = EstateType.ApartmentRoom;
+                if (HousingManager.GetOwnedHouseId(EstateType.FreeCompanyEstate) == houseId) {
+                    agent->SelectedEstateType = SelectedEstateType.FreeCompanyEstate;
+                } else if (HousingManager.GetOwnedHouseId(EstateType.PersonalChambers) == houseId) {
+                    agent->SelectedEstateType = SelectedEstateType.PersonalChambers;
+                } else if (HousingManager.GetOwnedHouseId(EstateType.PersonalEstate) == houseId) {
+                    agent->SelectedEstateType = SelectedEstateType.PersonalEstate;
+                } else if (HousingManager.GetOwnedHouseId(EstateType.ApartmentRoom) == houseId) {
+                    agent->SelectedEstateType = SelectedEstateType.ApartmentRoom;
                 } else {
-                    Service.Chat.PrintError("You are not inside your own estate.", Name);
-                    Service.Chat.PrintError(CommandUsage, Name);
+                    if (ShowCommandErrors) {
+                        Service.Chat.PrintError("You are not inside your own estate.", Name);
+                        Service.Chat.PrintError(CommandUsage, Name);
+                    }
+
                     return;
                 }
 
                 break;
             case "a":
             case "apartment":
-                agent->SelectedEstateType = EstateType.ApartmentRoom;
+                agent->SelectedEstateType = SelectedEstateType.ApartmentRoom;
                 break;
             case "c":
             case "chambers":
-                agent->SelectedEstateType = EstateType.PersonalChambers;
+                agent->SelectedEstateType = SelectedEstateType.PersonalChambers;
                 break;
             case "p":
             case "personal":
-                agent->SelectedEstateType = EstateType.PersonalEstate;
+                agent->SelectedEstateType = SelectedEstateType.PersonalEstate;
                 break;
             case "f":
             case "fc":
             case "freecompany":
-                agent->SelectedEstateType = EstateType.FreeCompanyEstate;
+                agent->SelectedEstateType = SelectedEstateType.FreeCompanyEstate;
                 break;
             default:
-                Service.Chat.PrintError("Unrecognised Estate Type", Name);
-                Service.Chat.PrintError(CommandUsage, Name);
+                if (ShowCommandErrors) {
+                    Service.Chat.PrintError("Unrecognised Estate Type", Name);
+                    Service.Chat.PrintError(CommandUsage, Name);
+                }
+
                 return;
         }
 

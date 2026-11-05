@@ -49,9 +49,12 @@ public unsafe class SubmarineDestinationLetters : UiAdjustments.SubTweak {
             var data = addon->Destinations.GetPointer((int)index);
             if (!destinationLetters.TryGetValue(data->LocationName.ExtractText(), out var letters) && !destinationLetters.TryGetValue(data->DestinationName.ExtractText(), out letters)) return;
             
+            var existing = nameNode->NodeText.GetSeString();
+            // API14 may already provide the letter. Preserve the existing feature without doubling it.
+            if (existing.TextValue.StartsWith(letters, StringComparison.Ordinal)) return;
             var sb = new SeStringBuilder();
             sb.Append($"{letters} ");
-            sb.Append(nameNode->NodeText.GetSeString());
+            sb.Append(existing);
             nameNode->SetText(sb.Encode());
         } catch(Exception ex) {
             SimpleLog.Error(ex, "Error adding letters to submarine destination row.");

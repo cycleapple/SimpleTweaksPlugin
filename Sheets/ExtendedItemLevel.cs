@@ -7,7 +7,7 @@ using Lumina.Excel.Sheets;
 
 namespace SimpleTweaksPlugin.Sheets; 
 
-[Sheet( "ItemLevel")]
+[Sheet("ItemLevel", 3793107359u)]
 public readonly unsafe struct ExtendedItemLevel(ExcelPage page, uint offset, uint row) : IRowExtension<ExtendedItemLevel, ItemLevel> {
     public ExcelPage ExcelPage => page;
     public uint RowOffset => offset;

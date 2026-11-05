@@ -1,3 +1,4 @@
+using NumberArrayStruct = FFXIVClientStructs.FFXIV.Client.UI.Arrays.Common.ActionBarSlotNumberArray;
 #nullable enable
 using System;
 using System.Collections.Generic;
@@ -25,10 +26,8 @@ namespace SimpleTweaksPlugin.Tweaks.UiAdjustment;
 [Changelog("1.8.4.0", "Properly resets hotbar state on unload/disable")]
 [Changelog("1.9.2.0", "Added option to make skills that are out of range red")]
 public unsafe class FadeUnavailableActions : UiAdjustments.SubTweak {
-    private delegate void UpdateHotBarSlotDelegate(AddonActionBarBase* addon, ActionBarSlot* uiData, NumberArrayData* numberArray, StringArrayData* stringArray, int numberArrayIndex, int stringArrayIndex);
-    
-    [TweakHook, Signature("E8 ?? ?? ?? ?? 48 81 C6 ?? ?? ?? ?? 83 C7 11", DetourName = nameof(OnHotBarSlotUpdate))]
-    private readonly HookWrapper<UpdateHotBarSlotDelegate>? onHotBarSlotUpdateHook;
+[TweakHook(typeof(AddonActionBarBase), nameof(AddonActionBarBase.UpdateHotbarSlot), nameof(OnHotBarSlotUpdate))]
+    private readonly HookWrapper<AddonActionBarBase.Delegates.UpdateHotbarSlot>? onHotBarSlotUpdateHook;
 
     private readonly Dictionary<uint, Action?> actionCache = [];
 
@@ -107,7 +106,7 @@ public unsafe class FadeUnavailableActions : UiAdjustments.SubTweak {
 
         var numberArrayData = (NumberArrayStruct*) (&numberArray->IntArray[numberArrayIndex]);
 
-        if (numberArrayData->ActionType is not (NumberArrayActionType.Action or NumberArrayActionType.CraftAction)) {
+        if ((NumberArrayActionType)numberArrayData->ActionType is not (NumberArrayActionType.Action or NumberArrayActionType.CraftAction)) {
             ApplyTransparency(hotBarSlotData, false);
             return;
         }
@@ -136,7 +135,7 @@ public unsafe class FadeUnavailableActions : UiAdjustments.SubTweak {
         }
         else {
             ApplyTransparency(hotBarSlotData, ShouldFadeAction(numberArrayData));
-            ApplyReddening(hotBarSlotData, !numberArrayData->TargetInRange && !ShouldFadeAction(numberArrayData));
+            ApplyReddening(hotBarSlotData, !numberArrayData->InRange && !ShouldFadeAction(numberArrayData));
         }
     }
 
@@ -151,10 +150,10 @@ public unsafe class FadeUnavailableActions : UiAdjustments.SubTweak {
     }
 
     private bool ShouldFadeAction(NumberArrayStruct* numberArrayData) 
-        => !(numberArrayData->ActionAvailable_1 && numberArrayData->ActionAvailable_2);
+        => !(numberArrayData->Executable && numberArrayData->Executable2);
     
     private void ApplyReddening(ActionBarSlot* hotBarSlotData, bool redden) {
-        if (hotBarSlotData is null) return;
+        if (hotBarSlotData is null || hotBarSlotData->Icon is null) return;
         var iconComponent = (AtkComponentIcon*) hotBarSlotData->Icon->Component;
 
         if (iconComponent is null) return;
@@ -174,7 +173,7 @@ public unsafe class FadeUnavailableActions : UiAdjustments.SubTweak {
     }
     
     private void ApplyTransparency(ActionBarSlot* hotBarSlotData, bool fade) {
-        if (hotBarSlotData is null) return;
+        if (hotBarSlotData is null || hotBarSlotData->Icon is null) return;
         var iconComponent = (AtkComponentIcon*) hotBarSlotData->Icon->Component;
 
         if (iconComponent is null) return;
@@ -191,18 +190,7 @@ public unsafe class FadeUnavailableActions : UiAdjustments.SubTweak {
         }
     }
 
-    [StructLayout(LayoutKind.Explicit, Size = 0x40)]
-    private struct NumberArrayStruct {
-        [FieldOffset(0x00)] public NumberArrayActionType ActionType;
-        [FieldOffset(0x0C)] public uint ActionId;
-        [FieldOffset(0x14)] public bool ActionAvailable_1;
-        [FieldOffset(0x18)] public bool ActionAvailable_2;
-        [FieldOffset(0x20)] public int CooldownPercent;
-        [FieldOffset(0x28)] public int ManaCost;
-        [FieldOffset(0x40)] public bool TargetInRange;
-    }
-
-    private enum NumberArrayActionType: uint {
+private enum NumberArrayActionType: uint {
         Action = 0x2E,
         CraftAction = 0x36,
         
